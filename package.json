@@ -1,5 +1,5 @@
 {
-  "name": "insights-frontend-starter-app",
+  "name": "commit-tracker",
   "version": "1.1.0",
   "private": false,
   "scripts": {
@@ -93,6 +93,6 @@
     "webpack-cli": "3.3.11"
   },
   "insights": {
-    "appname": "starter"
+    "appname": "commit-tracker"
   }
 }

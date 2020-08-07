@@ -19,12 +19,14 @@ import some from 'lodash/some';
  *         see the difference with DashboardMap and InventoryDeployments.
  *
  */
-const SamplePage = asyncComponent(() => import(/* webpackChunkName: "SamplePage" */ './Routes/SamplePage/SamplePage'));
+const CommitPage = asyncComponent(() => import(/* webpackChunkName: "CommitPage" */ './Routes/CommitPage/CommitPage'));
 const OopsPage = asyncComponent(() => import(/* webpackChunkName: "OopsPage" */ './Routes/OopsPage/OopsPage'));
 const NoPermissionsPage = asyncComponent(() => import(/* webpackChunkName: "NoPermissionsPage" */ './Routes/NoPermissionsPage/NoPermissionsPage'));
 
 const paths = {
-    samplePage: '/sample',
+    pageAppCommit: '/:app/:commit',
+    pageApp: '/:app',
+    page: '/',
     oops: '/oops',
     noPermissions: '/no-permissions'
 };
@@ -56,7 +58,9 @@ export const Routes = () => {
 
     return (
         <Switch>
-            <InsightsRoute path={paths.samplePage} component={SamplePage} rootClass='samplePage' />
+            <InsightsRoute path={paths.pageAppCommit} component={CommitPage} rootClass='samplePage'/>
+            <InsightsRoute path={paths.pageApp} component={CommitPage} rootClass='samplePage'/>
+            <InsightsRoute path={paths.page} component={CommitPage} rootClass='samplePage' />
             <InsightsRoute path={paths.oops} component={OopsPage} rootClass='oopsPage' />
             <InsightsRoute path={paths.noPermissions} component={NoPermissionsPage} rootClass='noPermissionsPage' />
             { /* Finally, catch all unmatched routes */}
