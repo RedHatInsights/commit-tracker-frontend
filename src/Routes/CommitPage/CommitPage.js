@@ -59,10 +59,10 @@ const CommitPage = ({ match }) => {
                 let row = [];
                 cols.forEach(function (item2) {
                     if (item2 === 'app') {
-                        let url = 'apps/starter/' + item[item2];
+                        let url = 'apps/commit-tracker/' + item[item2];
                         row.push({ title: <a href={url}>{item[item2]}</a> });
                     } else if (item2 === 'commit_hash') {
-                        let url = 'apps/starter/' + item.app + '/' + item[item2];
+                        let url = 'apps/commit-tracker/' + item.app + '/' + item[item2];
                         row.push({ title: <a href={url}>{item[item2]}</a> });
                     } else {
                         row.push(item[item2]);
