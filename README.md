@@ -2,4 +2,4 @@
 
 # commit-tracker-frontend
 
-This is the frontend for the commit-tracker app
+This is the frontend repo for the commit-tracker app
