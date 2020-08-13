@@ -64,6 +64,9 @@ const CommitPage = ({ match }) => {
                     } else if (item2 === 'commit_hash') {
                         let url = 'internal/commit-tracker/' + item.app + '/' + item[item2];
                         row.push({ title: <a href={url}>{item[item2]}</a> });
+                    } else if (item2 === 'html_url') {
+                        let url = item.html_url;
+                        row.push({ title: <a href={url}>{item[item2]}</a> });
                     } else {
                         row.push(item[item2]);
                     }
