@@ -109,6 +109,7 @@ export class CommitPage extends React.Component {
 
         urlBit += '?offset=' + ((this.state.page - 1) * this.state.pageSize);
         urlBit += '&limit=' + this.state.pageSize;
+        urlBit += '&reverse=true';
         this.setState({ url: urlBit }, () => {
             this.grabResults();
         });
