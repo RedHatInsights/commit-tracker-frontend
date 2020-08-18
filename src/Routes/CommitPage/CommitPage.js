@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+//import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { withRouter } from 'react-router-dom';
 
-import { StackItem, Stack } from '@patternfly/react-core';
+import { StackItem, Stack, Pagination } from '@patternfly/react-core';
 import { Main, PageHeader, PageHeaderTitle } from '@redhat-cloud-services/frontend-components';
 
 import {
@@ -14,6 +15,7 @@ import {
 import PropTypes from 'prop-types';
 
 import './commit-page.scss';
+//import { render } from 'enzyme';
 
 /**
  * A smart component that handles all the api calls and data needed by the dumb components.
@@ -23,39 +25,48 @@ import './commit-page.scss';
  * https://medium.com/@thejasonfile/dumb-components-and-smart-components-e7b33a698d43
  */
 
-const CommitPage = ({ match }) => {
+export class CommitPage extends React.Component {
+    static propTypes = {
+        location: PropTypes.object,
+        history: PropTypes.object,
+        eventEmitter: PropTypes.object,
+        match: PropTypes.object
+    };
 
-    //const [setData] = useState([]);
-    const [data, setData] = useState([]);
-    const [columns, setColumns] = useState([]);
-    const [rows, setRows] = useState([]);
-    const [stats, setStats] = useState([]);
-    const app = match.params.app;
-    const commit = match.params.commit;
+    constructor(props) {
+        super(props);
+        console.log(props.match);
+        const params = new URLSearchParams(props.location.search);
 
-    let url = '/api/commit-tracker/track/';
-    let statsUrl = '/api/commit-tracker/stats/';
-    if (app !== undefined) {
-        url += app + '/';
-        statsUrl += app + '/';
+        let limit = params.get('limit') === null ? 10 : params.get('limit');
+        let offset = params.get('offset') === null ? 0 : params.get('offset');
+        let page = params.get('page') === null ? 1 : params.get('page');
+        let pageSize = params.get('pageSize') === null ? 10 : params.get('pageSize');
+        this.state = {
+            page,
+            pageSize,
+            data: {},
+            columns: [],
+            rows: {},
+            stats: {},
+            limit,
+            offset,
+            url: '',
+            meta: {},
+            app: props.match.params.app,
+            commit: props.match.params.commit
+        };
+        this.params = new URLSearchParams(props.location.search);
     }
 
-    if (commit !== undefined) {
-        url += commit + '/';
-        statsUrl += commit + '/';
-    }
-
-    //let columns = [];
-
-    useEffect(() => {
-        fetch(url)
-        .then((data) => data.json())
-        .then((allData) => {
-            setData(allData);
-            let cols = Object.keys(allData[0]);
-
+    grabResults() {
+        console.log(this.state.url);
+        fetch(this.state.url)
+        .then(response => response.json())
+        .then(data => this.setState({ data }, () => {
+            let cols = Object.keys(data.data[0]);
             let rows = [];
-            allData.forEach(function (item) {
+            data.data.forEach(function (item) {
                 let row = [];
                 cols.forEach(function (item2) {
                     if (item2 === 'app') {
@@ -73,55 +84,96 @@ const CommitPage = ({ match }) => {
                 });
                 rows.push(row);
             });
-            setRows(rows);
+
             cols = cols.map(c => c.replace('_', ' '));
-            setColumns(cols);
+            this.setState({ rows, columns: cols, meta: data.meta });
+        }));
+    }
 
+    componentDidMount() {
+        this.updateUrl();
+    }
+
+    updateUrl() {
+        let urlBit = '/api/commit-tracker/track/';
+
+        if (this.state.app !== undefined) {
+            urlBit += this.state.app + '/';
+            // statsUrl += app + '/';
+        }
+
+        if (this.commit !== undefined) {
+            urlBit += this.state.commit + '/';
+            // statsUrl += commit + '/';
+        }
+
+        urlBit += '?offset=' + ((this.state.page - 1) * this.state.pageSize);
+        urlBit += '&limit=' + this.state.pageSize;
+        this.setState({ url: urlBit }, () => {
+            this.grabResults();
         });
-        fetch(statsUrl)
-        .then((stats) => stats.json())
-        .then((allStats) => {
-            setStats(allStats);
+    }
+
+    setPage = (_event, pageNumber) => {
+        console.log('NEXT PAGE');
+        this.setState({ page: pageNumber }, () => {
+            this.updateUrl();
         });
-    }, []);
+    }
 
-    // const columns = [
-    //     { title: 'Header cell' },
-    //     'Branches',
-    //     { title: 'Pull requests', props: { className: 'pf-u-text-align-center' } },
-    //     '' // deliberately empty
-    // ];
-    //const rows = [['one', 'two', 'three', 'four'], ['one', 'two', 'three', 'four'], ['one', 'two', 'three', 'four']];
+    setPageSize = (_event, perPage) => {
+        this.setState({ pageSize: perPage }, () => {
+            this.updateUrl();
+        });
+    }
 
-    return (
-        <React.Fragment>
-            <PageHeader>
-                <PageHeaderTitle title={app}/>
-                <p> {commit} </p>
-            </PageHeader>
-            <Main>
-                <Stack hasGutter>
-                    <StackItem>
-                        <Stack hasGutter>
-                            <StackItem>
-                                <Table aria-label="Compact Table" variant={TableVariant.compact} cells={columns} rows={rows}>
-                                    <TableHeader />
-                                    <TableBody />
-                                </Table>
-                                <pre>{JSON.stringify(stats, null, 2)}</pre>
-                                <pre style={{ visibility: 'hidden' }}>{JSON.stringify(data, null, 2)}</pre>
-                            </StackItem>
-                        </Stack>
-                    </StackItem>
-                </Stack>
-            </Main>
-        </React.Fragment>
-    );
-};
-
-CommitPage.propTypes = {
-    match: PropTypes.any,
-    location: PropTypes.any
+    render() {
+        document.title = 'Commit Tracker';
+        const {
+            app,
+            commit,
+            data,
+            columns,
+            rows,
+            page,
+            pageSize,
+            meta
+        } = this.state;
+        return (
+            <React.Fragment>
+                <PageHeader>
+                    <PageHeaderTitle title={app}/>
+                    <p> {commit} </p>
+                </PageHeader>
+                <Main>
+                    <Stack hasGutter>
+                        <StackItem>
+                            <Stack hasGutter>
+                                <StackItem>
+                                    <Table aria-label="Compact Table" variant={TableVariant.compact} cells={columns} rows={rows}>
+                                        <TableHeader />
+                                        <TableBody />
+                                    </Table>
+                                    <Pagination
+                                        widgetId="pagination-options-menu-bottom"
+                                        perPage={pageSize}
+                                        page={page}
+                                        itemCount={meta.count}
+                                        dropDirection="up"
+                                        onSetPage={this.setPage}
+                                        onPerPageSelect={this.setPageSize}
+                                        style={ { marginTop: '1rem' } }
+                                    />
+                                    <pre>{JSON.stringify(this.stats, null, 2)}</pre>
+                                    <pre style={{ visibility: 'hidden' }}>{JSON.stringify(data, null, 2)}</pre>
+                                </StackItem>
+                            </Stack>
+                        </StackItem>
+                    </Stack>
+                </Main>
+            </React.Fragment>
+        );
+    };
 };
 
 export default withRouter(CommitPage);
