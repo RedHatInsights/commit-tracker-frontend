@@ -6,11 +6,12 @@ import { Routes } from './Routes';
 import './App.scss';
 
 import { Provider } from 'react-redux';
-import { getRegistry } from '@redhat-cloud-services/frontend-components-utilities/files/Registry';
-import { NotificationsPortal, notifications } from '@redhat-cloud-services/frontend-components-notifications/';
+import { getRegistry } from '@redhat-cloud-services/frontend-components-utilities/Registry';
+import NotificationsPortal from '@redhat-cloud-services/frontend-components-notifications/NotificationPortal';
+import { notificationsReducer } from '@redhat-cloud-services/frontend-components-notifications/redux';
 
 const registry = getRegistry();
-registry.register({ notifications });
+registry.register({ notifications: notificationsReducer });
 
 class App extends Component {
 
