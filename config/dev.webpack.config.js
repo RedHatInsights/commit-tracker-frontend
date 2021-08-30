@@ -11,7 +11,7 @@ const webpackProxy = {
     useProxy: true,
     useCloud: true,
     appUrl: process.env.BETA ? ['/beta/internal/commit-tracker'] : ['/internal/commit-tracker'],
-    env: 'ci-beta'
+    env: 'qa-beta'
 };
 
 const { config: webpackConfig, plugins } = config({
