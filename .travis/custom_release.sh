@@ -10,4 +10,10 @@ then
         rm -rf ./dist/.git
         .travis/release.sh "${env}-beta"
     done
+    
+    do
+        echo "PUSHING ${env}-stable"
+        rm -rf ./dist/.git
+        .travis/release.sh "${env}-stable"
+    done
 fi
