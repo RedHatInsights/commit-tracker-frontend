@@ -11,6 +11,7 @@ then
         .travis/release.sh "${env}-beta"
     done
     
+    for env in ci qa 
     do
         echo "PUSHING ${env}-stable"
         rm -rf ./dist/.git
