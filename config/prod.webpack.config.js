@@ -13,4 +13,4 @@ plugins.push(
 module.exports = {
     ...webpackConfig,
     plugins
-}
+};
