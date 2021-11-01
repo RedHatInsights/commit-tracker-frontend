@@ -94,6 +94,6 @@
     "stylelint-scss": "3.20.1"
   },
   "insights": {
-    "appname": "commit-tracker"
+    "appname": "commitTracker"
   }
 }
